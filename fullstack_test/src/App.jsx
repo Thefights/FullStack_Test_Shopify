@@ -1,14 +1,24 @@
-import { Layout, LegacyCard, Page } from "@shopify/polaris";
+import {
+  Badge,
+  Button,
+  Divider,
+  Layout,
+  LegacyCard,
+  Page,
+  Select,
+  TextField,
+} from "@shopify/polaris";
+import { DeleteIcon, PlusIcon } from "@shopify/polaris-icons";
 import "@shopify/polaris/build/esm/styles.css";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 
 function App() {
-  const { control, register, watch, handleSubmit } = useForm({
+  const { control } = useForm({
     defaultValues: {
       campaign: "",
       title: "",
       description: "",
-      optioms: [
+      options: [
         {
           title: "Single",
           subTitle: "Standard price",
@@ -34,33 +44,169 @@ function App() {
     name: "options",
   });
 
+  const discountOptions = [
+    { label: "None", value: "None" },
+    { label: "% discount", value: "% discount" },
+    { label: "Fixed amount", value: "Fixed amount" },
+  ];
+
   return (
-    <Page fullWidth title="Create volume discount">
-      <Layout>
-        <Layout.Section>
-          <LegacyCard title="Order details" sectioned>
-            <p>
-              Use to follow a normal section with a secondary section to create
-              a 2/3 + 1/3 layout on detail pages (such as individual product or
-              order pages). Can also be used on any page that needs to structure
-              a lot of content. This layout stacks the columns on small screens.
-            </p>
-          </LegacyCard>
-          <LegacyCard title="Order details" sectioned>
-            <p>
-              Use to follow a normal section with a secondary section to create
-              a 2/3 + 1/3 layout on detail pages (such as individual product or
-              order pages). Can also be used on any page that needs to structure
-              a lot of content. This layout stacks the columns on small screens.
-            </p>
-          </LegacyCard>
-        </Layout.Section>
-        <Layout.Section variant="oneThird">
-          <LegacyCard title="Tags" sectioned>
-            <p>Add tags to your order.</p>
-          </LegacyCard>
-        </Layout.Section>
-      </Layout>
+    <Page title="Create volume discount">
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <Layout>
+          <Layout.Section>
+            <LegacyCard title="General" sectioned>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "16px",
+                }}
+              >
+                <Controller
+                  name="campaign"
+                  control={control}
+                  render={({ field: { ref, ...field } }) => (
+                    <TextField label="Campaign" autoComplete="off" {...field} />
+                  )}
+                />
+                <Controller
+                  name="title"
+                  control={control}
+                  render={({ field: { ref, ...field } }) => (
+                    <TextField label="Title" autoComplete="off" {...field} />
+                  )}
+                />
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field: { ref, ...field } }) => (
+                    <TextField
+                      label="Description"
+                      autoComplete="off"
+                      {...field}
+                    />
+                  )}
+                />
+              </div>
+            </LegacyCard>
+
+            <LegacyCard title="Volume discount rule" sectioned>
+              {fields.map((field, index) => (
+                <div key={field.id}>
+                  {index > 0 && <Divider style={{ margin: "16px 0" }} />}
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    <Badge tone="warning-strong" size="large">
+                      OPTION {index + 1}
+                    </Badge>
+                    <Button
+                      plain
+                      destructive
+                      icon={DeleteIcon}
+                      onClick={() => remove(index)}
+                    />
+                  </div>
+
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                      gap: "16px",
+                    }}
+                  >
+                    <Controller
+                      name={`options.${index}.title`}
+                      control={control}
+                      render={({ field: { ref, ...field } }) => (
+                        <TextField
+                          label="Title"
+                          autoComplete="off"
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name={`options.${index}.subTitle`}
+                      control={control}
+                      render={({ field: { ref, ...field } }) => (
+                        <TextField
+                          label="Subtitle"
+                          autoComplete="off"
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name={`options.${index}.label`}
+                      control={control}
+                      render={({ field: { ref, ...field } }) => (
+                        <TextField
+                          label="Label (optional)"
+                          autoComplete="off"
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name={`options.${index}.quantity`}
+                      control={control}
+                      render={({ field: { ref, ...field } }) => (
+                        <TextField
+                          label="Quantity"
+                          type="number"
+                          autoComplete="off"
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name={`options.${index}.discountType`}
+                      control={control}
+                      render={({ field: { ref, ...field } }) => (
+                        <Select
+                          label="Discount Type"
+                          options={discountOptions}
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name={`options.${index}.amount`}
+                      control={control}
+                      render={({ field: { ref, ...field } }) => (
+                        <TextField
+                          label="Amount"
+                          autoComplete="off"
+                          {...field}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+              ))}
+              <div style={{ marginTop: "16px" }}>
+                <Button fullWidth icon={PlusIcon}>
+                  Add option
+                </Button>
+              </div>
+            </LegacyCard>
+          </Layout.Section>
+
+          <Layout.Section variant="oneThird">
+            <LegacyCard title="Tags" sectioned>
+              <p>Add tags to your order.</p>
+            </LegacyCard>
+          </Layout.Section>
+        </Layout>
+      </div>
     </Page>
   );
 }
